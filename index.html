@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Exception Handling Playground</title>
+    <title>labproject06</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
@@ -19,6 +19,7 @@
                 type="text" 
                 id="stringInput" 
                 placeholder="Enter a string" 
+                maxlength="50"
                 class="w-full p-3 border-2 border-blue-300 rounded-lg focus:ring-2 focus:ring-blue-500 transition"
             >
             
@@ -31,7 +32,7 @@
 
             <div 
                 id="resultArea" 
-                class="mt-4 p-4 rounded-lg text-center font-semibold transition-all duration-300"
+                class="mt-4 p-4 rounded-lg text-center font-semibold transition-all duration-300 break-words"
             ></div>
         </div>
     </div>
@@ -46,29 +47,46 @@
             }
         }
 
-        // Method to check if string contains only letters
-        function areLetters(str) {
-            if (!/^[a-zA-Z]+$/.test(str)) {
-                throw new InputException("String must contain only alphabets!");
+        // Validation function
+        function validateInput(inputString) {
+            if (inputString === '') {
+                $('#resultArea')
+                    .removeClass('bg-green-200 text-green-800')
+                    .addClass('bg-red-200 text-red-800')
+                    .text('❌ Please enter a string!');
+                return false;
             }
-            return true;
-        }
 
-        // Run Test method
-        function runTest(str) {
-            try {
-                if (areLetters(str)) {
-                    $('#resultArea')
-                        .removeClass('bg-red-200 text-red-800')
-                        .addClass('bg-green-200 text-green-800')
-                        .text(`✅ Valid input: ${str} contains only letters!`);
+            // Method to check if string contains only letters
+            const areLetters = (str) => {
+                // Truncate input if too long
+                const MAX_DISPLAY_LENGTH = 50;
+                const displayStr = str.length > MAX_DISPLAY_LENGTH 
+                    ? str.substring(0, MAX_DISPLAY_LENGTH) + '...' 
+                    : str;
+
+                // Check if string contains ANY non-alphabetic character
+                if (/[^a-zA-Z]/.test(str)) {
+                    throw new InputException("String must contain ONLY alphabets!");
                 }
+                return displayStr;
+            };
+
+            // Run Test method
+            try {
+                const validStr = areLetters(inputString);
+                $('#resultArea')
+                    .removeClass('bg-red-200 text-red-800')
+                    .addClass('bg-green-200 text-green-800')
+                    .text(`✅ Valid input: ${validStr} contains only letters!`);
+                return true;
             } catch (error) {
                 if (error instanceof InputException) {
                     $('#resultArea')
                         .removeClass('bg-green-200 text-green-800')
                         .addClass('bg-red-200 text-red-800')
                         .text(`❌ Error: ${error.message}`);
+                    return false;
                 }
             }
         }
@@ -76,16 +94,16 @@
         // Button click event
         $('#checkButton').on('click', function() {
             const inputString = $('#stringInput').val().trim();
-            
-            if (inputString === '') {
-                $('#resultArea')
-                    .removeClass('bg-green-200 text-green-800')
-                    .addClass('bg-red-200 text-red-800')
-                    .text('❌ Please enter a string!');
-                return;
-            }
+            validateInput(inputString);
+        });
 
-            runTest(inputString);
+        // Enter key event
+        $('#stringInput').on('keypress', function(e) {
+            // Check if the pressed key is Enter (key code 13)
+            if (e.which === 13) {
+                const inputString = $(this).val().trim();
+                validateInput(inputString);
+            }
         });
     });
     </script>
