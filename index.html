@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exception Handling Playground</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+</head>
+<body class="bg-gradient-to-br from-blue-100 to-purple-200 min-h-screen flex items-center justify-center p-4">
+    <div class="container mx-auto max-w-md bg-white shadow-2xl rounded-2xl p-8 transform transition-all hover:scale-105">
+        <h1 class="text-3xl font-bold text-center text-blue-600 mb-6 animate__animated animate__fadeIn">
+            Exception Handling 🚨
+        </h1>
+
+        <div class="space-y-4">
+            <input 
+                type="text" 
+                id="stringInput" 
+                placeholder="Enter a string" 
+                class="w-full p-3 border-2 border-blue-300 rounded-lg focus:ring-2 focus:ring-blue-500 transition"
+            >
+            
+            <button 
+                id="checkButton" 
+                class="w-full bg-blue-500 text-white py-3 rounded-lg hover:bg-blue-600 transition transform active:scale-95"
+            >
+                Check String
+            </button>
+
+            <div 
+                id="resultArea" 
+                class="mt-4 p-4 rounded-lg text-center font-semibold transition-all duration-300"
+            ></div>
+        </div>
+    </div>
+
+    <script>
+    $(document).ready(function() {
+        // Custom Exception class
+        class InputException extends Error {
+            constructor(message) {
+                super(message);
+                this.name = "InputException";
+            }
+        }
+
+        // Method to check if string contains only letters
+        function areLetters(str) {
+            if (!/^[a-zA-Z]+$/.test(str)) {
+                throw new InputException("String must contain only alphabets!");
+            }
+            return true;
+        }
+
+        // Run Test method
+        function runTest(str) {
+            try {
+                if (areLetters(str)) {
+                    $('#resultArea')
+                        .removeClass('bg-red-200 text-red-800')
+                        .addClass('bg-green-200 text-green-800')
+                        .text(`✅ Valid input: ${str} contains only letters!`);
+                }
+            } catch (error) {
+                if (error instanceof InputException) {
+                    $('#resultArea')
+                        .removeClass('bg-green-200 text-green-800')
+                        .addClass('bg-red-200 text-red-800')
+                        .text(`❌ Error: ${error.message}`);
+                }
+            }
+        }
+
+        // Button click event
+        $('#checkButton').on('click', function() {
+            const inputString = $('#stringInput').val().trim();
+            
+            if (inputString === '') {
+                $('#resultArea')
+                    .removeClass('bg-green-200 text-green-800')
+                    .addClass('bg-red-200 text-red-800')
+                    .text('❌ Please enter a string!');
+                return;
+            }
+
+            runTest(inputString);
+        });
+    });
+    </script>
+</body>
+</html>
